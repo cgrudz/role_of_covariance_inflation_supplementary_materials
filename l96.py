@@ -21,25 +21,6 @@ def l96(x, t, f):
 
 
 ########################################################################################################################
-# Non-linear model vectorized for ensembles
-
-
-def l96V(x, t, f):
-    """"This describes the derivative for the non-linear Lorenz 96 Model of arbitrary dimension n.
-
-    This will take the state vector x of shape sys_dim X ens_dim and return the equation for dxdt"""
-
-    # shift minus and plus indices
-    x_m_2 = np.concatenate([x[-2:, :], x[:-2, :]])
-    x_m_1 = np.concatenate([x[-1:, :], x[:-1, :]])
-    x_p_1 = np.concatenate([x[1:,:], np.reshape(x[0,:], [1, len(x[0, :])])], axis=0)
-
-    dxdt = (x_p_1-x_m_2)*x_m_1 - x + f
-
-    return dxdt
-
-
-########################################################################################################################
 # Jacobian
 
 
@@ -74,23 +55,6 @@ def l96_rk4_step(x, h, f):
     k_x_2 = l96(x + k_x_1 * (h / 2.0), h, f)
     k_x_3 = l96(x + k_x_2 * (h / 2.0), h, f)
     k_x_4 = l96(x + k_x_3 * h, h, f)
-
-    x_step = x + (h / 6.0) * (k_x_1 + 2 * k_x_2 + 2 * k_x_3 + k_x_4)
-
-    return x_step
-
-
-########################################################################################################################
-# non-linear L96 Runge Kutta vectorized for ensembles
-
-
-def l96_rk4_stepV(x, h, f):
-
-    # calculate the evolution of x one step forward via RK-4
-    k_x_1 = l96V(x, h, f)
-    k_x_2 = l96V(x + k_x_1 * (h / 2.0), h, f)
-    k_x_3 = l96V(x + k_x_2 * (h / 2.0), h, f)
-    k_x_4 = l96V(x + k_x_3 * h, h, f)
 
     x_step = x + (h / 6.0) * (k_x_1 + 2 * k_x_2 + 2 * k_x_3 + k_x_4)
 
